@@ -488,34 +488,36 @@
 
 <script>
 (() => {
-  // ===== 설정 =====
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjIEoVpbCXLFTWTNAFJMNfR1F22yqQtILWwD2vD4GyRApURahLxz5-bUtYNg/exec'; // 당신의 Web App URL
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjlEoVpbcXLFTwTNAFjNMRlF2zyqQtILWwDzvD4GyRApURahLxz5-bUtYnrXv5U9uTeA/exec';   // ← Apps Script Web App URL
   const CID_KEY = 'pk_cid_v1';
   const SID_KEY = 'pk_sid_v1';
 
-  function cid() {
+  function cid(){
     let v = localStorage.getItem(CID_KEY);
-    if (!v) { v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); localStorage.setItem(CID_KEY, v); }
+    if(!v){ v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); localStorage.setItem(CID_KEY, v); }
     return v;
   }
-  function sid() {
+  function sid(){
     let v = sessionStorage.getItem(SID_KEY);
-    if (!v) { v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); sessionStorage.setItem(SID_KEY, v); }
+    if(!v){ v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); sessionStorage.setItem(SID_KEY, v); }
     return v;
   }
-  function send(ev, label='') {
+
+  // ⚠️ text/plain 으로 전송 → 프리플라이트(OPTIONS) 발생 안함
+  function send(ev, label=''){
+    const body = JSON.stringify({
+      event: ev, label,
+      client_id: cid(), session_id: sid(),
+      url: location.href, referrer: document.referrer, ua: navigator.userAgent
+    });
     fetch(ENDPOINT, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        event: ev, label,
-        client_id: cid(), session_id: sid(),
-        url: location.href, referrer: document.referrer, ua: navigator.userAgent
-      })
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ← 핵심
+      body
     }).catch(()=>{});
   }
 
-  // 기본 유입
+  // 유입
   send('page_view');
 
   // 10초 체류 → engaged
@@ -523,12 +525,12 @@
 
   // 스크롤 25%
   let sc25=false;
-  window.addEventListener('scroll', () => {
+  window.addEventListener('scroll', ()=>{
     const ratio = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
-    if (!sc25 && ratio >= 0.25) { sc25 = true; send('scroll_25'); }
+    if(!sc25 && ratio >= 0.25){ sc25=true; send('scroll_25'); }
   }, {passive:true});
 
-  // 레포트 미리보기 버튼
+  // 레포트 미리보기
   document.querySelectorAll('[onclick*="click_report_preview"]').forEach(el=>{
     el.addEventListener('click', ()=> send('report_preview_click'));
   });
@@ -545,13 +547,13 @@
 
   // 팝업 노출/클릭
   const popup = document.getElementById('welcomePopup');
-  if (popup) {
+  if (popup){
     const mo = new MutationObserver(m=>{
       if (m.some(x=>x.attributeName==='class' && popup.classList.contains('show'))) {
         send('popup_impression'); mo.disconnect();
       }
     });
-    mo.observe(popup, {attributes:true});
+    mo.observe(popup,{attributes:true});
     popup.querySelectorAll('a,button').forEach(el=>{
       el.addEventListener('click', ()=> send('popup_click'));
     });
@@ -559,10 +561,12 @@
 
   // 일반 클릭(참여 시그널)
   document.addEventListener('click', (e)=>{
-    const a = e.target.closest('a,button'); if (!a) return;
-    if (!a.dataset.logged) { a.dataset.logged = '1'; send('click', (a.textContent||'').trim().slice(0,80)); }
+    const a = e.target.closest('a,button');
+    if(!a) return;
+    if(!a.dataset.logged){ a.dataset.logged='1'; send('click', (a.textContent||'').trim().slice(0,80)); }
   }, {capture:true});
 })();
 </script>
+
 </body>
 </html>
