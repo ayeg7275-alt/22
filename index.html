@@ -490,35 +490,60 @@
 (function () {
   // ====== 설정 ======
 <script>
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec";
+  const ENDPOINT = 'WEB_APP_URL'; // ← 앱스 스크립트 Web App URL 붙여넣기
+  const CID_KEY = 'pk_cid_v1';
+  const SID_KEY = 'pk_sid_v1';
+  function cid(){ return localStorage.getItem(CID_KEY) || (localStorage.setItem(CID_KEY, crypto.randomUUID()), localStorage.getItem(CID_KEY)); }
+  function sid(){ const s= sessionStorage.getItem(SID_KEY) || crypto.randomUUID(); sessionStorage.setItem(SID_KEY, s); return s; }
+  function send(ev, label=''){
+    fetch(ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ event: ev, label, client_id: cid(), session_id: sid(),
+        url: location.href, referrer: document.referrer, ua: navigator.userAgent })}).catch(()=>{});
+  }
+  // 기본: 랜딩 유입(세션 시작 시)
+  send('page_view');
 
-// 공통 이벤트 로거
-function logEvent(event, label="") {
-  fetch(ENDPOINT, {
-    method: "POST",
-    mode: "no-cors",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      event: event,
-      label: label,
-      page: window.location.href,
-      referrer: document.referrer,
-      device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
-      lang: navigator.language,
-      screen: `${window.screen.width}x${window.screen.height}`
-    })
+  // 10초 이상 체류 시 "engaged" (이탈율 계산에 사용)
+  setTimeout(()=>send('engaged','10s'), 10000);
+
+  // 스크롤 25% 도달 시 1회 기록
+  let sc25=false; window.addEventListener('scroll',()=>{
+    if(!sc25 && (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight >= 0.25){
+      sc25=true; send('scroll_25');
+    }
+  }, {passive:true});
+
+  // [레포트 미리보기] 버튼
+  document.querySelectorAll('[onclick*="click_report_preview"]').forEach(el=>{
+    el.addEventListener('click', ()=> send('report_preview_click'));
   });
-}
 
-// 페이지 유입 기록
-window.addEventListener("load", () => logEvent("page_view"));
-
-// 버튼 이벤트 기록
-document.querySelectorAll("[data-track]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    logEvent(btn.dataset.track, btn.dataset.label || "");
+  // [상담으로 추천 받기] 버튼들
+  document.querySelectorAll('a[href*="open.kakao.com"]').forEach(el=>{
+    el.addEventListener('click', ()=> send('consult_click', el.textContent.trim()));
   });
-});
+
+  // [컨설팅 사전예약하기] 버튼들
+  document.querySelectorAll('a[href*="forms.gle"]').forEach(el=>{
+    el.addEventListener('click', ()=> send('booking_click', el.textContent.trim()));
+  });
+
+  // 팝업: 노출/클릭 트래킹
+  // 팝업 DOM id가 welcomePopup 이므로 show 시점에 impression 기록
+  const popup = document.getElementById('welcomePopup');
+  const mo = new MutationObserver(m=>{ if([...m].some(x=>x.attributeName==='class' && popup.classList.contains('show'))){ send('popup_impression'); mo.disconnect(); }});
+  if(popup) mo.observe(popup,{attributes:true});
+  // 팝업 CTA
+  document.querySelectorAll('#welcomePopup a').forEach(el=>{
+    el.addEventListener('click', ()=> send('popup_click'));
+  });
+
+  // 일반 클릭도(참여 신호) 필요하면 공통 훅
+  document.addEventListener('click', (e)=>{
+    const a = e.target.closest('a,button');
+    if(!a) return;
+    if(!a.hasAttribute('data-logged')){ a.setAttribute('data-logged','1'); send('click', a.textContent.trim().slice(0,80)); }
+  }, {capture:true});
 </script>
 </body>
 </html>
