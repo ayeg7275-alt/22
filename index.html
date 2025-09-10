@@ -488,7 +488,9 @@
 
 <script>
 (() => {
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjlEoVpbcXLFTwTNAFjNMRlF2zyqQtILWwDzvD4GyRApURahLxz5-bUtYnrXv5U9uTeA/exec';   // ← Apps Script Web App URL
+  // ★ Apps Script Web App URL 로 바꾸세요
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjIEoVpbCXLFTWTNAFJMNfR1F22yqQtILWwD2vD4GyRApURahLxz5-bUtYNg/exec';
+
   const CID_KEY = 'pk_cid_v1';
   const SID_KEY = 'pk_sid_v1';
 
@@ -503,24 +505,35 @@
     return v;
   }
 
-  // ⚠️ text/plain 으로 전송 → 프리플라이트(OPTIONS) 발생 안함
+  // --- 핵심: 프리플라이트 회피 전송 함수 ---
   function send(ev, label=''){
-    const body = JSON.stringify({
+    const payload = {
       event: ev, label,
       client_id: cid(), session_id: sid(),
       url: location.href, referrer: document.referrer, ua: navigator.userAgent
-    });
+    };
+    const data = JSON.stringify(payload);
+    // 1) 가능한 경우 Beacon 사용(프리플라이트 없음, CORS 불요)
+    if (navigator.sendBeacon) {
+      const blob = new Blob([data], { type: 'text/plain;charset=UTF-8' });
+      const ok = navigator.sendBeacon(ENDPOINT, blob);
+      if (ok) return;
+    }
+    // 2) Fallback: no-cors + text/plain => 프리플라이트 없음
     fetch(ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ← 핵심
-      body
+      mode: 'no-cors',
+      keepalive: true,
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, // 절대 application/json 금지
+      body: data
     }).catch(()=>{});
   }
 
+  // ===== 트래킹 바인딩 =====
   // 유입
   send('page_view');
 
-  // 10초 체류 → engaged
+  // 10초 체류
   setTimeout(()=>send('engaged','10s'), 10000);
 
   // 스크롤 25%
@@ -559,7 +572,7 @@
     });
   }
 
-  // 일반 클릭(참여 시그널)
+  // 일반 클릭(참여 신호)
   document.addEventListener('click', (e)=>{
     const a = e.target.closest('a,button');
     if(!a) return;
@@ -567,6 +580,7 @@
   }, {capture:true});
 })();
 </script>
+
 
 </body>
 </html>
