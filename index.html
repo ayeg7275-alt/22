@@ -487,206 +487,105 @@
   </script>
 
   <!-- 이벤트 수집 스니펫 -->
-  <script>
-  (function(){
-    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
-    const SECRET   = 'perfume_secret';
-
-    const SID_KEY = 'pfm_sid';
-    let SESSION_ID = localStorage.getItem(SID_KEY);
-    if (!SESSION_ID){ SESSION_ID = 's_' + Math.random().toString(36).slice(2) + Date.now(); localStorage.setItem(SID_KEY, SESSION_ID); }
-
-    const base = () => ({
-      token: SECRET,
-      session_id: SESSION_ID,
-      page: location.href,
-      referrer: document.referrer || '',
-      device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-      lang: navigator.language || '',
-      ua: navigator.userAgent,
-      screen: { w: screen.width, h: screen.height },
-      viewport: { w: window.innerWidth, h: window.innerHeight }
-    });
-
-    function send(event_name, extra){
-      if(!event_name) return;
-      const payload = Object.assign(base(), { event_name, extra: extra || {} });
-      try{
-        if (navigator.sendBeacon){
-          const blob = new Blob([JSON.stringify(payload)], { type:'application/json' });
-          navigator.sendBeacon(ENDPOINT, blob);
-        }else{
-          fetch(ENDPOINT, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), keepalive:true });
-        }
-      }catch(_){}
-    }
-
-    // page view
-    window.addEventListener('load', ()=> send('page_view'));
-
-    // 버튼/링크에 data-evt로 바인딩
-    let clickedCTA = false;
-    function bindEvt(){
-      document.querySelectorAll('[data-evt]').forEach(el=>{
-        el.addEventListener('click', ()=>{
-          const t = el.getAttribute('data-evt');
-          if (t === 'report_preview'){ send('click_report_preview'); }
-          if (t === 'consulting'){ send('click_consulting_cta'); clickedCTA = true; }
-          if (t === 'booking_scroll'){ send('click_booking_cta', { variant:'scroll' }); clickedCTA = true; }
-          if (t === 'booking_form'){ send('click_booking_cta', { variant:'form' }); clickedCTA = true; }
-          if (t === 'popup_cta'){ send('click_popup_cta'); clickedCTA = true; }
-        }, { passive:true });
-      });
-    }
-    if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', bindEvt); } else { bindEvt(); }
-
-    // 스크롤/체류 + exit
-    let start = Date.now(), maxScroll = 0, exitSent = false;
-    document.addEventListener('scroll', ()=>{
-      const h = document.documentElement;
-      const docH = Math.max(h.scrollHeight, h.offsetHeight, h.clientHeight);
-      const pos  = window.scrollY + window.innerHeight;
-      const pct  = Math.min(100, Math.round((pos / docH) * 100));
-      if (pct > maxScroll) maxScroll = pct;
-    }, { passive:true });
-
-    function sendExit(){
-      if (exitSent) return; exitSent = true;
-      send('exit', { dur_ms: Date.now() - start, scroll: maxScroll, cta_clicked: clickedCTA });
-    }
-    document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'hidden') sendExit(); });
-    window.addEventListener('pagehide', sendExit);
-  })();
-  </script>
-
-  <!-- (호스팅 환경) 자동 삽입될 수 있는 스크립트 유지 -->
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f3dc37f4aa4e',t:'MTc1NzQwMjczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
-<script>
+ <script>
 (function(){
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
   const SECRET   = 'perfume_secret';
 
-  // 세션ID (로컬스토리지)
-  function getSid(){
-    try{
-      const k = '_sid_perfume';
+  // --- 기본 공통 데이터 ---
+  function sid() {
+    try {
+      const k = 'pfm_sid';
       let v = localStorage.getItem(k);
-      if(!v){
-        v = (self.crypto && crypto.randomUUID) ? crypto.randomUUID()
-            : (Date.now()+'-'+Math.random().toString(16).slice(2));
-        localStorage.setItem(k, v);
-      }
+      if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem(k, v); }
       return v;
-    }catch(e){
-      return Date.now()+'-'+Math.random().toString(16).slice(2);
+    } catch(_) { return Math.random().toString(36).slice(2); }
+  }
+  const base = {
+    token: SECRET,
+    session_id: sid(),
+    page: location.href,
+    referrer: document.referrer || '',
+    device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+    lang: (navigator.language||'').toLowerCase(),
+    ua: navigator.userAgent
+  };
+
+  // --- 전송: 우선 sendBeacon(POST text/plain), 실패 시 iframe GET(base64) ---
+  function send(data) {
+    const payload = JSON.stringify(Object.assign({}, base, data));
+    let ok = false;
+    if (navigator.sendBeacon) {
+      try {
+        ok = navigator.sendBeacon(ENDPOINT, new Blob([payload], {type:'text/plain;charset=UTF-8'}));
+      } catch(_){}
+    }
+    if (!ok) {
+      const url = ENDPOINT + '?j=' + btoa(unescape(encodeURIComponent(payload)));
+      const ifr = document.createElement('iframe');
+      ifr.style.display = 'none';
+      ifr.width=0; ifr.height=0; ifr.src = url;
+      document.body.appendChild(ifr);
+      setTimeout(()=>{ try{document.body.removeChild(ifr);}catch(_){}} , 2000);
     }
   }
 
-  function base(){
-    return {
-      token: SECRET,
-      session_id: getSid(),
-      page: location.href,
-      referrer: document.referrer || '',
-      ua: navigator.userAgent,
-      lang: navigator.language || '',
-      device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-      screen:  { w: screen && screen.width  || '', h: screen && screen.height || '' },
-      viewport:{ w: innerWidth || '', h: innerHeight || '' }
-    };
-  }
-
-  // CORS 무시 3단계 전송: Beacon → fetch(no-cors) → 이미지 GET
-  function send(payload){
-    const body = JSON.stringify(payload);
-
-    if (navigator.sendBeacon){
-      try{
-        const ok = navigator.sendBeacon(ENDPOINT, new Blob([body], {type:'text/plain'}));
-        if (ok) return;
-      }catch(_){}
-    }
-    try{
-      // 헤더 지정 안 함(단순 요청) + no-cors + keepalive ⇒ preflight 없음
-      fetch(ENDPOINT, {method:'POST', mode:'no-cors', keepalive:true, cache:'no-store', body});
-      return;
-    }catch(_){}
-    // 픽셀식 폴백
-    const img = new Image();
-    img.src = ENDPOINT + '?p=' + encodeURIComponent(body) + '&_=' + Date.now();
-  }
-
-  // --- 기본 지표 ---
+  // --- 페이지뷰 & 체류/스크롤 ---
   const t0 = Date.now();
   let maxScroll = 0;
-  addEventListener('scroll', ()=> {
-    const scrolled = scrollY + innerHeight;
-    const total    = Math.max(1, document.documentElement.scrollHeight);
-    const pct      = Math.round(100 * Math.min(1, scrolled/total));
-    if (pct > maxScroll) maxScroll = pct;
-  }, {passive:true});
+  function pct() { const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+                   const v = window.innerHeight; const y = window.scrollY||document.documentElement.scrollTop||0;
+                   return Math.min(100, Math.round(((y+v)/h)*100)); }
+  window.addEventListener('scroll', ()=>{ maxScroll = Math.max(maxScroll, pct()); }, {passive:true});
 
-  // 페이지 진입
-  addEventListener('load', ()=> {
-    send({ ...base(), event_name:'page_view' });
-  });
-
-  // 이탈(체류/스크롤)
-  addEventListener('pagehide', ()=> {
-    send({ ...base(), event_name:'leave',
-      extra:{ time_on_page_sec: Math.round((Date.now()-t0)/1000), max_scroll_pct:maxScroll }
+  window.addEventListener('load', function(){
+    send({event_name:'pageview'});
+    // 종료 시 체류/스크롤 요약
+    addEventListener('beforeunload', function(){
+      send({
+        event_name:'page_exit',
+        time_on_page_sec: Math.round((Date.now()-t0)/1000),
+        max_scroll_pct: maxScroll
+      });
     });
   });
 
-  // --- 버튼 추적(텍스트 기준, HTML 수정 없이 바인딩) ---
-  // 레포트 미리보기 버튼
-  function bindByText(text, evt){
-    [...document.querySelectorAll('a,button')].forEach(el=>{
-      const t = (el.textContent||'').replace(/\s+/g,'');
-      if (t.includes(text.replace(/\s+/g,''))){
-        el.addEventListener('click', ()=>{
-          send({ ...base(), event_name: evt, element_id: el.id||'', text: el.textContent.trim() });
-        });
-      }
-    });
+  // --- 클릭 트래킹(HTML 수정 없이 셀렉터로 잡음) ---
+  function onClick(selector, event_name, extraFn){
+    document.addEventListener('click', function(e){
+      const el = e.target.closest(selector);
+      if (!el) return;
+      const data = {event_name, element_id: el.id||'', text: (el.innerText||'').trim().slice(0,80)};
+      if (extraFn) Object.assign(data, extraFn(el));
+      send(data);
+    }, true);
   }
-  bindByText('레포트미리보기','report_preview_click');
 
-  // 상담으로 추천 받기(세 카드)
-  function bindConsult(){
-    const cards = document.querySelectorAll('.grid.lg\\:grid-cols-3 > div');
-    cards.forEach(card=>{
-      const plan = (card.querySelector('.text-sm')||{}).textContent || '';
-      const btn  = card.querySelector('a[href*="open.kakao.com"]');
-      if (btn){
-        btn.addEventListener('click', ()=>{
-          send({ ...base(), event_name:'consult_click', plan: plan.trim() });
-        });
-      }
-    });
-  }
-  addEventListener('load', bindConsult);
-
-  // 사전예약(상단 스티키 + 카운트다운)
-  document.querySelectorAll('a[href*="forms.gle"], a[href="#action"]').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const section = el.closest('.sticky') ? 'sticky' : (el.closest('#action') ? 'countdown':'other');
-      send({ ...base(), event_name:'booking_click', element_id: el.id||'', text: el.textContent.trim(), extra:{section} });
-    });
+  // 1) 레포트 미리보기(데스크톱/모바일 버튼 모두)
+  onClick('button[onclick*="showReportPreview"], .shine:has(>span)::not(*)', 'report_preview_click');
+  onClick('button, a', 'report_preview_click', el=>{
+    if ((el.tagName==='BUTTON' || el.tagName==='A') && /레포트 미리보기/.test(el.textContent)) return {};
   });
 
-  // 팝업 노출/클릭
-  const originalShowPopup = window.showPopup;
-  window.showPopup = function(){
-    if (typeof originalShowPopup === 'function') originalShowPopup();
-    send({ ...base(), event_name:'popup_show' });
-  };
-  const popupCta = document.querySelector('#welcomePopup a');
-  if (popupCta){
-    popupCta.addEventListener('click', ()=>{
-      send({ ...base(), event_name:'popup_cta_click' });
-    });
-  }
+  // 2) 상담받기(카카오 오픈채팅 링크)
+  onClick('a[href^="https://open.kakao.com/o/"]', 'consulting_click', el=>{
+    // 카드 타이틀로 플랜 추론
+    let plan=''; try{
+      const card = el.closest('.glass');
+      const t = card ? card.querySelector('.text-lg, h3') : null;
+      plan = t ? (t.textContent||'').trim() : '';
+    }catch(_){}
+    return {plan};
+  });
+
+  // 3) 사전예약하기(구글 폼)
+  onClick('a[href^="https://forms.gle/"]', 'booking_click');
+
+  // 4) 팝업 CTA
+  onClick('#welcomePopup a', 'popup_cta_click');
+
+  // 디버그용
+  window.__perfumeTest = ()=>send({event_name:'test_click', extra:{note:'manual'}});
 })();
 </script>
 
