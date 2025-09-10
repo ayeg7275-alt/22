@@ -561,5 +561,134 @@
 
   <!-- (호스팅 환경) 자동 삽입될 수 있는 스크립트 유지 -->
   <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f3dc37f4aa4e',t:'MTc1NzQwMjczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>
+(function(){
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
+  const SECRET   = 'perfume_secret';
+
+  // 세션ID (로컬스토리지)
+  function getSid(){
+    try{
+      const k = '_sid_perfume';
+      let v = localStorage.getItem(k);
+      if(!v){
+        v = (self.crypto && crypto.randomUUID) ? crypto.randomUUID()
+            : (Date.now()+'-'+Math.random().toString(16).slice(2));
+        localStorage.setItem(k, v);
+      }
+      return v;
+    }catch(e){
+      return Date.now()+'-'+Math.random().toString(16).slice(2);
+    }
+  }
+
+  function base(){
+    return {
+      token: SECRET,
+      session_id: getSid(),
+      page: location.href,
+      referrer: document.referrer || '',
+      ua: navigator.userAgent,
+      lang: navigator.language || '',
+      device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      screen:  { w: screen && screen.width  || '', h: screen && screen.height || '' },
+      viewport:{ w: innerWidth || '', h: innerHeight || '' }
+    };
+  }
+
+  // CORS 무시 3단계 전송: Beacon → fetch(no-cors) → 이미지 GET
+  function send(payload){
+    const body = JSON.stringify(payload);
+
+    if (navigator.sendBeacon){
+      try{
+        const ok = navigator.sendBeacon(ENDPOINT, new Blob([body], {type:'text/plain'}));
+        if (ok) return;
+      }catch(_){}
+    }
+    try{
+      // 헤더 지정 안 함(단순 요청) + no-cors + keepalive ⇒ preflight 없음
+      fetch(ENDPOINT, {method:'POST', mode:'no-cors', keepalive:true, cache:'no-store', body});
+      return;
+    }catch(_){}
+    // 픽셀식 폴백
+    const img = new Image();
+    img.src = ENDPOINT + '?p=' + encodeURIComponent(body) + '&_=' + Date.now();
+  }
+
+  // --- 기본 지표 ---
+  const t0 = Date.now();
+  let maxScroll = 0;
+  addEventListener('scroll', ()=> {
+    const scrolled = scrollY + innerHeight;
+    const total    = Math.max(1, document.documentElement.scrollHeight);
+    const pct      = Math.round(100 * Math.min(1, scrolled/total));
+    if (pct > maxScroll) maxScroll = pct;
+  }, {passive:true});
+
+  // 페이지 진입
+  addEventListener('load', ()=> {
+    send({ ...base(), event_name:'page_view' });
+  });
+
+  // 이탈(체류/스크롤)
+  addEventListener('pagehide', ()=> {
+    send({ ...base(), event_name:'leave',
+      extra:{ time_on_page_sec: Math.round((Date.now()-t0)/1000), max_scroll_pct:maxScroll }
+    });
+  });
+
+  // --- 버튼 추적(텍스트 기준, HTML 수정 없이 바인딩) ---
+  // 레포트 미리보기 버튼
+  function bindByText(text, evt){
+    [...document.querySelectorAll('a,button')].forEach(el=>{
+      const t = (el.textContent||'').replace(/\s+/g,'');
+      if (t.includes(text.replace(/\s+/g,''))){
+        el.addEventListener('click', ()=>{
+          send({ ...base(), event_name: evt, element_id: el.id||'', text: el.textContent.trim() });
+        });
+      }
+    });
+  }
+  bindByText('레포트미리보기','report_preview_click');
+
+  // 상담으로 추천 받기(세 카드)
+  function bindConsult(){
+    const cards = document.querySelectorAll('.grid.lg\\:grid-cols-3 > div');
+    cards.forEach(card=>{
+      const plan = (card.querySelector('.text-sm')||{}).textContent || '';
+      const btn  = card.querySelector('a[href*="open.kakao.com"]');
+      if (btn){
+        btn.addEventListener('click', ()=>{
+          send({ ...base(), event_name:'consult_click', plan: plan.trim() });
+        });
+      }
+    });
+  }
+  addEventListener('load', bindConsult);
+
+  // 사전예약(상단 스티키 + 카운트다운)
+  document.querySelectorAll('a[href*="forms.gle"], a[href="#action"]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const section = el.closest('.sticky') ? 'sticky' : (el.closest('#action') ? 'countdown':'other');
+      send({ ...base(), event_name:'booking_click', element_id: el.id||'', text: el.textContent.trim(), extra:{section} });
+    });
+  });
+
+  // 팝업 노출/클릭
+  const originalShowPopup = window.showPopup;
+  window.showPopup = function(){
+    if (typeof originalShowPopup === 'function') originalShowPopup();
+    send({ ...base(), event_name:'popup_show' });
+  };
+  const popupCta = document.querySelector('#welcomePopup a');
+  if (popupCta){
+    popupCta.addEventListener('click', ()=>{
+      send({ ...base(), event_name:'popup_cta_click' });
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
