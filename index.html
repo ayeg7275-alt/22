@@ -464,25 +464,25 @@
     window.addEventListener('load', ()=>{ setTimeout(showPopup, 2000); });
     document.getElementById('welcomePopup').addEventListener('click', (e)=>{ if (e.target === e.currentTarget) closePopup(); });
     document.getElementById('reportPreview').addEventListener('click', (e)=>{ if (e.target === e.currentTarget) closeReportPreview(); });
-    const liveApplicantsEl = document.getElementById('liveApplicants'); let applicants = 86;
+     liveApplicantsEl = document.getElementById('liveApplicants'); let applicants = 86;
     if(liveApplicantsEl){
       setInterval(()=>{ if(Math.random() > 0.6){ applicants += 1; liveApplicantsEl.textContent = applicants.toLocaleString('ko-KR'); liveApplicantsEl.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'}); } }, 4000);
     }
     function pad(n){ return String(n).padStart(2,'0'); }
-    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; const now = new Date(); let targetDate = new Date(now.getTime() + SEVEN_DAYS);
-    const tbD = document.getElementById('tb-d'), tbH = document.getElementById('tb-h'), tbM = document.getElementById('tb-m'), tbS = document.getElementById('tb-s');
+     SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;  now = new Date(); let targetDate = new Date(now.getTime() + SEVEN_DAYS);
+     tbD = document.getElementById('tb-d'), tbH = document.getElementById('tb-h'), tbM = document.getElementById('tb-m'), tbS = document.getElementById('tb-s');
     function updateTimer(){
-      const now = new Date().getTime(); const left = Math.max(0, targetDate.getTime() - now);
+       now = new Date().getTime();  left = Math.max(0, targetDate.getTime() - now);
       if (left === 0){ targetDate = new Date(new Date().getTime() + SEVEN_DAYS); return; }
-      const d = Math.floor(left / (24*60*60*1000));
-      const h = Math.floor((left % (24*60*60*1000)) / (60*60*1000));
-      const m = Math.floor((left % (60*60*1000)) / (60*1000));
-      const s = Math.floor((left % (60*1000)) / 1000);
+       d = Math.floor(left / (24*60*60*1000));
+       h = Math.floor((left % (24*60*60*1000)) / (60*60*1000));
+       m = Math.floor((left % (60*60*1000)) / (60*1000));
+       s = Math.floor((left % (60*1000)) / 1000);
       if(tbD) tbD.textContent = pad(d); if(tbH) tbH.textContent = pad(h); if(tbM) tbM.textContent = pad(m); if(tbS) tbS.textContent = pad(s);
     }
     updateTimer(); setInterval(updateTimer, 1000);
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener('click', (e)=>{ const id = a.getAttribute('href').slice(1); const el = document.getElementById(id); if(el){ e.preventDefault(); el.scrollIntoView({ behavior:'smooth', block:'start' }); } });
+      a.addEventListener('click', (e)=>{  id = a.getAttribute('href').slice(1);  el = document.getElementById(id); if(el){ e.preventDefault(); el.scrollIntoView({ behavior:'smooth', block:'start' }); } });
     });
   </script>
 
@@ -490,7 +490,7 @@
 (function () {
   // ====== 설정 ======
 <script>
-  const ENDPOINT = 'WEB_APP_URL'; // ← 앱스 스크립트 Web App URL 붙여넣기
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjlEoVpbcXLFTwTNAFjNMRlF2zyqQtILWwDzvD4GyRApURahLxz5-bUtYnrXv5U9uTeA/exec'; // ← 앱스 스크립트 Web App URL 붙여넣기
   const CID_KEY = 'pk_cid_v1';
   const SID_KEY = 'pk_sid_v1';
   function cid(){ return localStorage.getItem(CID_KEY) || (localStorage.setItem(CID_KEY, crypto.randomUUID()), localStorage.getItem(CID_KEY)); }
