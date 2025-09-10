@@ -2,38 +2,45 @@
 <html lang="ko">
 <head>
   <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-PWT63X64');</script>
-<!-- End Google Tag Manager -->
-<meta charset="utf-8" />
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PWT63X64');</script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BX0P85DZ7T"></script>
+
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BX0P85DZ7T"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-BX0P85DZ7T');
   </script>
+
+  <!-- Vercel Insights -->
   <script>
     window.va = window.va || function(){ (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>
-</head>
+
   <title>시그니처 향기 컨설팅 </title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="시그니처 향기 컨설팅">
-<meta property="og:description" content="사전예약 시 향기키트 무료증정!">
-<meta property="og:url" content="https://perfume-kappa-eight.vercel.app/">
-<meta property="og:image" content="https://perfume-kappa-eight.vercel.app/sample.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="시그니처 향기 컨설팅">
+  <meta property="og:description" content="사전예약 시 향기키트 무료증정!">
+  <meta property="og:url" content="https://perfume-kappa-eight.vercel.app/">
+  <meta property="og:image" content="https://perfume-kappa-eight.vercel.app/sample.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg:#faf8f5;
@@ -80,15 +87,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     @keyframes shine { 0%{left:-60%} 60%{left:120%} 100%{left:120%} }
     .big-num{ font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
-    .hero-title{
-      font-size: 36px;
-      line-height: 1.12;
-      word-break: keep-all;
-      hyphens: auto;
-    }
-    @media (min-width: 1024px){
-      .hero-title{ font-size: 40px; }
-    }
+    .hero-title{ font-size: 36px; line-height: 1.12; word-break: keep-all; hyphens: auto; }
+    @media (min-width: 1024px){ .hero-title{ font-size: 40px; } }
     @media (max-width: 640px){
       .hero-title{ font-size: 28px; line-height: 1.3; }
       .hero-sub{ font-size: 16px; line-height: 1.6; }
@@ -131,8 +131,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           "고객은 기억합니다.<br>공간이 어떤 향이었는지."<br>
           <span class="text-lg md:text-xl text-orange-600 font-semibold">프리미엄 향기 솔루션 "사전예약 OPEN"</span>
         </h2>
-        
-
 
         <div class="space-y-3 mb-6 text-left">
           <div class="flex items-start gap-3">
@@ -193,7 +191,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-orange-100 text-orange-600">💬</span>
           <p class="text-sm md:text-base mobile-text" style="color: var(--text);">명품 브랜드 향기키트 3종(10ml) 무료 증정!</p>
         </div>
-        <a href="#action" class="shine rounded-xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-4 py-2 md:px-6 md:py-3 hover:opacity-95 transition">
+        <a href="#action"
+           onclick="gtag('event','click_booking_cta',{section:'sticky'});"
+           class="shine rounded-xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-4 py-2 md:px-6 md:py-3 hover:opacity-95 transition">
           컨설팅 사전예약하기
         </a>
       </div>
@@ -216,7 +216,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           단 한 번의 경험으로 완벽한 변화를,<br>프리미엄 향기 솔루션 출시 예정!
         </p>
         <div class="flex flex-col gap-2">
-          <a href="#action" class="shine rounded-2xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-6 py-4 text-lg text-center">
+          <a href="#action"
+             onclick="gtag('event','click_booking_cta',{section:'hero'});"
+             class="shine rounded-2xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-6 py-4 text-lg text-center">
             컨설팅 사전예약하기
           </a>
           <span class="text-sm md:text-base text-center sm:text-left" style="color: var(--muted);">
@@ -274,7 +276,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     <div class="h-px my-14 bg-gradient-to-r from-transparent via-amber-300/30 to-transparent"></div>
 
-    <!-- Social Proof (moved up) -->
+    <!-- Social Proof -->
     <section>
       <h2 class="text-xl md:text-3xl mobile-title font-bold mb-6">💬 꿉꿉한 냄새 숙소 → 게스트 상위 5% 숙소</h2>
       <div class="grid md:grid-cols-2 gap-5 mb-6">
@@ -362,14 +364,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <p class="mt-1 text-sm" style="color: var(--muted);">3가지 옵션을 비교하고 선택하세요</p>
         </div>
         <button
-  type="button"
-  onclick="gtag('event','click_report_preview',{device:'desktop'}); showReportPreview();"
-  class="hidden md:inline-flex items-center gap-2 shine rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold px-5 py-3 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
-  👀 레포트 미리보기
-</button>
+          type="button"
+          onclick="gtag('event','click_report_preview',{device:'desktop'}); showReportPreview();"
+          class="hidden md:inline-flex items-center gap-2 shine rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold px-5 py-3 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
+          👀 레포트 미리보기
+        </button>
       </div>
 
       <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Standard -->
         <div class="glass rounded-2xl p-6">
           <div class="text-sm mb-2" style="color: var(--muted);">Standard</div>
           <h3 class="text-lg font-semibold">가장 빠르고 합리적인 냄새 해결</h3>
@@ -378,9 +381,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <li>• 예산형 제품 추천</li>
             <li>• 셀프 관리 체크리스트</li>
           </ul>
-          <div class="mt-6"><a href="https://open.kakao.com/o/sgsXgqQh" target="_blank" class="rounded-lg border border-amber-300/40 px-4 py-2 text-sm hover:bg-amber-50 transition"onclick="gtag('event',click_consulting_cta',{plan:'standard'});">상담으로 추천 받기</a></div>
+          <div class="mt-6">
+            <a href="https://open.kakao.com/o/sgsXgqQh" target="_blank"
+               class="rounded-lg border border-amber-300/40 px-4 py-2 text-sm hover:bg-amber-50 transition"
+               onclick="gtag('event','click_consulting_cta',{plan:'standard'});">
+              상담으로 추천 받기
+            </a>
+          </div>
         </div>
 
+        <!-- Deluxe -->
         <div class="glass rounded-2xl p-6 relative ring-2 ring-amber-400/40">
           <div class="absolute -top-3 right-4 text-xs px-3 py-1 rounded-full rec-badge">추천</div>
           <div class="text-sm mb-2" style="color: var(--muted);">Deluxe</div>
@@ -390,9 +400,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <li>• 공간별 시나리오 설계</li>
             <li>• 유지관리 간소화</li>
           </ul>
-          <div class="mt-6"><a href="https://open.kakao.com/o/sgsXgqQh" target="_blank" class="rounded-lg bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-4 py-2 text-sm"onclick="gtag('event','click_consulting_cta',{plan:'standard'});">상담으로 추천 받기</a></div>
+          <div class="mt-6">
+            <a href="https://open.kakao.com/o/sgsXgqQh" target="_blank"
+               class="rounded-lg bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-4 py-2 text-sm"
+               onclick="gtag('event','click_consulting_cta',{plan:'deluxe'});">
+              상담으로 추천 받기
+            </a>
+          </div>
         </div>
 
+        <!-- Premium -->
         <div class="glass rounded-2xl p-6">
           <div class="text-sm mb-2" style="color: var(--muted);">Premium</div>
           <h3 class="text-lg font-semibold">향기 브랜딩 풀케어</h3>
@@ -401,34 +418,38 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <li>• 향기 정기 배송 관리</li>
             <li>• 고도화 리포트 제공</li>
           </ul>
-          <div class="mt-6"><a href="https://open.kakao.com/o/sgsXgqQh" target="_blank" class="rounded-lg border border-amber-300/40 px-4 py-2 text-sm hover:bg-amber-50 transition"onclick="gtag('event','click_consulting_cta',{plan:'standard'});">상담으로 추천 받기</a></div>
+          <div class="mt-6">
+            <a href="https://open.kakao.com/o/sgsXgqQh" target="_blank"
+               class="rounded-lg border border-amber-300/40 px-4 py-2 text-sm hover:bg-amber-50 transition"
+               onclick="gtag('event','click_consulting_cta',{plan:'premium'});">
+              상담으로 추천 받기
+            </a>
+          </div>
         </div>
       </div>
 
-     <div class="mt-6 md:hidden">
-  <button
-    type="button"
-    onclick="gtag('event','click_report_preview',{device:'mobile'}); showReportPreview();"
-    class="w-full inline-flex justify-center items-center gap-2 shine rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold px-5 py-3 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg">
-    👀 레포트 미리보기
-  </button>
-</div>
+      <!-- mobile report preview -->
+      <div class="mt-6 md:hidden">
+        <button
+          type="button"
+          onclick="gtag('event','click_report_preview',{device:'mobile'}); showReportPreview();"
+          class="w-full inline-flex justify-center items-center gap-2 shine rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold px-5 py-3 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg">
+          👀 레포트 미리보기
+        </button>
+      </div>
+    </section>
 
     <div class="h-px my-14 bg-gradient-to-r from-transparent via-amber-300/30 to-transparent"></div>
 
-    <!-- 샘플 키트 안내 섹션 -->
+    <!-- 샘플 키트 안내 -->
     <section class="mt-10">
       <div class="soft rounded-3xl p-6 md:p-8">
         <h3 class="text-xl md:text-3xl mobile-large font-extrabold text-center">
           직접 경험하고 판단하세요. 프리미엄 3종 향기키트(10ml) 무료증정.
         </h3>
-        
-        <!-- 이미지 영역 -->
         <div class="flex justify-center mt-8">
           <div class="glass rounded-2xl p-4 w-full max-w-sm">
             <img src="https://i.imgur.com/PSKXkuf.jpeg" alt="프리미엄 향기키트 3종" class="w-full h-64 object-cover rounded-xl" onerror="this.src=''; this.alt='이미지 로드 실패'; this.style.display='none';">
-            
-            <!-- 설명 텍스트 - 이미지 아래 -->
             <div class="text-center mt-4">
               <div class="space-y-2 text-base">
                 <div><span class="text-green-600">✔</span> <span class="font-medium" style="color: var(--text);">명품 브랜드 프리미엄 향 3종</span></div>
@@ -478,14 +499,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               </div>
             </div>
 
-    <div class="mt-6">
+            <div class="mt-6">
               <a href="https://forms.gle/wbR4GTb5Rz7Q4yZY6"
-   target="_blank" rel="noopener noreferrer"
-   class="w-full inline-flex justify-center shine rounded-2xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-6 py-4 text-lg"
-   onclick="gtag('event','click_booking_cta',{section:'countdown', text:'컨설팅 사전예약하기'});">
-  컨설팅 사전예약하기
-</a>
-</div>
+                 target="_blank" rel="noopener noreferrer"
+                 class="w-full inline-flex justify-center shine rounded-2xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-6 py-4 text-lg"
+                 onclick="gtag('event','click_booking_cta',{section:'countdown', text:'컨설팅 사전예약하기'});">
+                컨설팅 사전예약하기
+              </a>
+            </div>
 
             <div class="mt-3 text-center text-xs" style="color: var(--muted);">
               현재 <span id="liveApplicants" class="font-semibold" style="color: var(--text);">86</span>명이 보고 있습니다
@@ -581,43 +602,22 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </section>
   </main>
 
+  <!-- 기존 동작 스크립트(팝업/타이머 등) -->
   <script>
     // 팝업창 관리
-    function showPopup() {
-      document.getElementById('welcomePopup').classList.add('show');
-    }
-    
-    function closePopup() {
-      document.getElementById('welcomePopup').classList.remove('show');
-    }
+    function showPopup() { document.getElementById('welcomePopup').classList.add('show'); }
+    function closePopup() { document.getElementById('welcomePopup').classList.remove('show'); }
 
     // 레포트 미리보기 팝업 관리
-    function showReportPreview() {
-      document.getElementById('reportPreview').classList.add('show');
-    }
-    
-    function closeReportPreview() {
-      document.getElementById('reportPreview').classList.remove('show');
-    }
+    function showReportPreview() { document.getElementById('reportPreview').classList.add('show'); }
+    function closeReportPreview() { document.getElementById('reportPreview').classList.remove('show'); }
     
     // 페이지 로드 후 2초 뒤에 팝업 표시
-    window.addEventListener('load', () => {
-      setTimeout(showPopup, 2000);
-    });
-    
+    window.addEventListener('load', () => { setTimeout(showPopup, 2000); });
     // 팝업 배경 클릭 시 닫기
-    document.getElementById('welcomePopup').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) {
-        closePopup();
-      }
-    });
-
+    document.getElementById('welcomePopup').addEventListener('click', (e) => { if (e.target === e.currentTarget) closePopup(); });
     // 레포트 팝업 배경 클릭 시 닫기
-    document.getElementById('reportPreview').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) {
-        closeReportPreview();
-      }
-    });
+    document.getElementById('reportPreview').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeReportPreview(); });
 
     // 신청자 수 증가 (데모)
     const liveApplicantsEl = document.getElementById('liveApplicants');
@@ -634,37 +634,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     // 7일 주기 카운트다운
     function pad(n){ return String(n).padStart(2,'0'); }
-    
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
     const now = new Date();
     let targetDate = new Date(now.getTime() + SEVEN_DAYS);
-
     const tbD = document.getElementById('tb-d');
     const tbH = document.getElementById('tb-h');
     const tbM = document.getElementById('tb-m');
     const tbS = document.getElementById('tb-s');
 
     function updateTimer(){
-      const now = new Date().getTime();
-      const left = Math.max(0, targetDate.getTime() - now);
-      
-      if (left === 0) {
-        targetDate = new Date(new Date().getTime() + SEVEN_DAYS);
-        return;
-      }
-      
+      const left = Math.max(0, targetDate.getTime() - new Date().getTime());
+      if (left === 0) { targetDate = new Date(new Date().getTime() + SEVEN_DAYS); return; }
       const d = Math.floor(left / (24*60*60*1000));
       const h = Math.floor((left % (24*60*60*1000)) / (60*60*1000));
       const m = Math.floor((left % (60*60*1000)) / (60*1000));
       const s = Math.floor((left % (60*1000)) / 1000);
-
-      tbD.textContent = pad(d);
-      tbH.textContent = pad(h);
-      tbM.textContent = pad(m);
-      tbS.textContent = pad(s);
+      tbD.textContent = pad(d); tbH.textContent = pad(h); tbM.textContent = pad(m); tbS.textContent = pad(s);
     }
-    updateTimer();
-    setInterval(updateTimer, 1000);
+    updateTimer(); setInterval(updateTimer, 1000);
 
     // 부드러운 해시 스크롤
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -675,9 +662,134 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       });
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f3dc37f4aa4e',t:'MTc1NzQwMjczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PWT63X64"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+
+  <!-- ANALYTICS to Sheet: Apps Script WebApp로 전송 -->
+  <script>
+    const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
+
+    // util
+    function uuidv4(){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); }
+    const LS_VISITOR_KEY = 'vv_id';
+    const LS_SESSION_KEY = 'vv_sid';
+    const LS_SESSION_AT  = 'vv_sid_at';
+    const SESSION_TTL_MS = 30 * 60 * 1000; // 30분
+
+    function getVisitorId(){
+      let id = localStorage.getItem(LS_VISITOR_KEY);
+      if(!id){ id = uuidv4(); localStorage.setItem(LS_VISITOR_KEY, id); }
+      return id;
+    }
+    function getSessionId(){
+      const now = Date.now();
+      let sid   = localStorage.getItem(LS_SESSION_KEY);
+      let sAt   = Number(localStorage.getItem(LS_SESSION_AT) || 0);
+      if(!sid || (now - sAt) > SESSION_TTL_MS){ sid = uuidv4(); }
+      localStorage.setItem(LS_SESSION_KEY, sid);
+      localStorage.setItem(LS_SESSION_AT, String(now));
+      return sid;
+    }
+    function getUTM(){
+      const p = new URLSearchParams(location.search);
+      const refHost = document.referrer ? (new URL(document.referrer)).host : '';
+      return {
+        utm_source:   p.get('utm_source')   || refHost,
+        utm_medium:   p.get('utm_medium')   || '',
+        utm_campaign: p.get('utm_campaign') || '',
+        utm_content:  p.get('utm_content')  || '',
+        utm_term:     p.get('utm_term')     || ''
+      };
+    }
+    function deviceType(){
+      const ua = navigator.userAgent.toLowerCase();
+      return /mobi|android|iphone|ipad/.test(ua) ? 'mobile' : 'desktop';
+    }
+    function screenSize(){ try { return `${screen.width}x${screen.height}`; } catch(e){ return ''; } }
+
+    function sendEvent(event, label='', extra={}){
+      try{
+        const payload = Object.assign({
+          event, label,
+          vid: getVisitorId(),
+          sid: getSessionId(),
+          page: location.href,
+          ref: document.referrer || '',
+          device: deviceType(),
+          lang: navigator.language || '',
+          screen: screenSize()
+        }, getUTM(), extra);
+
+        const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(ENDPOINT, blob);
+        } else {
+          fetch(ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }).catch(()=>{});
+        }
+      } catch(e){}
+    }
+
+    // wiring
+    const pageStartAt = Date.now();
+    let ctaClicked = false;
+
+    // 1) 페이지뷰
+    sendEvent('page_view');
+
+    // 2) 레포트 미리보기 클릭
+    document.querySelectorAll('[onclick*="showReportPreview"]').forEach(el=>{
+      el.addEventListener('click', ()=> sendEvent('click_report_preview', 'report_button'));
+    });
+
+    // 3) 상담받기 클릭 (플랜 추출)
+    document.querySelectorAll('a[onclick*="click_consulting_cta"]').forEach(a=>{
+      const m = (a.getAttribute('onclick')||'').match(/plan:'([^']+)'/);
+      const plan = m ? m[1] : '';
+      a.addEventListener('click', ()=>{
+        ctaClicked = true;
+        sendEvent('click_consulting_cta', plan);
+      });
+    });
+
+    // 4) 사전예약하기 클릭 (영역 라벨)
+    document.querySelectorAll('[onclick*="click_booking_cta"]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        ctaClicked = true;
+        const m = (el.getAttribute('onclick')||'').match(/section:'([^']+)'/);
+        sendEvent('click_booking_cta', m ? m[1] : '');
+      });
+    });
+
+    // 5) 팝업 열림/팝업 CTA
+    (function(){
+      const nativeShowPopup = window.showPopup;
+      if(typeof nativeShowPopup === 'function'){
+        window.showPopup = function(){
+          sendEvent('popup_open');
+          return nativeShowPopup.apply(this, arguments);
+        }
+      }
+    })();
+    document.querySelectorAll('#welcomePopup a').forEach(a=>{
+      a.addEventListener('click', ()=>{
+        ctaClicked = true;
+        sendEvent('click_popup_cta', 'welcome_popup');
+      });
+    });
+
+    // 6) 이탈(종료) 이벤트
+    function sendExit(){
+      const dur = Date.now() - pageStartAt;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const scrollPct = Math.round(Math.max(0, Math.min(100, (window.scrollY / maxScroll) * 100)));
+      sendEvent('exit', ctaClicked ? 'with_interaction' : 'bounce', { dur_ms: dur, scroll: scrollPct, cta_clicked: ctaClicked });
+    }
+    document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'hidden') sendExit(); });
+    window.addEventListener('beforeunload', sendExit);
+  </script>
+
+  <!-- Cloudflare cf-challenge (원본 유지) -->
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c4f3dc37f4aa4e',t:'MTc1NzQwMjczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+
+  <!-- GTM noscript -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PWT63X64" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+</body>
 </html>
