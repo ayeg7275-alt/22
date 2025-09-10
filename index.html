@@ -487,63 +487,82 @@
   </script>
 
 <script>
-(function () {
-  // ====== 설정 ======
-<script>
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjlEoVpbcXLFTwTNAFjNMRlF2zyqQtILWwDzvD4GyRApURahLxz5-bUtYnrXv5U9uTeA/exec'; // ← 앱스 스크립트 Web App URL 붙여넣기
+(() => {
+  // ===== 설정 =====
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxjIEoVpbCXLFTWTNAFJMNfR1F22yqQtILWwD2vD4GyRApURahLxz5-bUtYNg/exec'; // 당신의 Web App URL
   const CID_KEY = 'pk_cid_v1';
   const SID_KEY = 'pk_sid_v1';
-  function cid(){ return localStorage.getItem(CID_KEY) || (localStorage.setItem(CID_KEY, crypto.randomUUID()), localStorage.getItem(CID_KEY)); }
-  function sid(){ const s= sessionStorage.getItem(SID_KEY) || crypto.randomUUID(); sessionStorage.setItem(SID_KEY, s); return s; }
-  function send(ev, label=''){
-    fetch(ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ event: ev, label, client_id: cid(), session_id: sid(),
-        url: location.href, referrer: document.referrer, ua: navigator.userAgent })}).catch(()=>{});
+
+  function cid() {
+    let v = localStorage.getItem(CID_KEY);
+    if (!v) { v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); localStorage.setItem(CID_KEY, v); }
+    return v;
   }
-  // 기본: 랜딩 유입(세션 시작 시)
+  function sid() {
+    let v = sessionStorage.getItem(SID_KEY);
+    if (!v) { v = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random()); sessionStorage.setItem(SID_KEY, v); }
+    return v;
+  }
+  function send(ev, label='') {
+    fetch(ENDPOINT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        event: ev, label,
+        client_id: cid(), session_id: sid(),
+        url: location.href, referrer: document.referrer, ua: navigator.userAgent
+      })
+    }).catch(()=>{});
+  }
+
+  // 기본 유입
   send('page_view');
 
-  // 10초 이상 체류 시 "engaged" (이탈율 계산에 사용)
+  // 10초 체류 → engaged
   setTimeout(()=>send('engaged','10s'), 10000);
 
-  // 스크롤 25% 도달 시 1회 기록
-  let sc25=false; window.addEventListener('scroll',()=>{
-    if(!sc25 && (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight >= 0.25){
-      sc25=true; send('scroll_25');
-    }
+  // 스크롤 25%
+  let sc25=false;
+  window.addEventListener('scroll', () => {
+    const ratio = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+    if (!sc25 && ratio >= 0.25) { sc25 = true; send('scroll_25'); }
   }, {passive:true});
 
-  // [레포트 미리보기] 버튼
+  // 레포트 미리보기 버튼
   document.querySelectorAll('[onclick*="click_report_preview"]').forEach(el=>{
     el.addEventListener('click', ()=> send('report_preview_click'));
   });
 
-  // [상담으로 추천 받기] 버튼들
+  // 상담(오픈채팅)
   document.querySelectorAll('a[href*="open.kakao.com"]').forEach(el=>{
     el.addEventListener('click', ()=> send('consult_click', el.textContent.trim()));
   });
 
-  // [컨설팅 사전예약하기] 버튼들
+  // 사전예약(구글폼)
   document.querySelectorAll('a[href*="forms.gle"]').forEach(el=>{
     el.addEventListener('click', ()=> send('booking_click', el.textContent.trim()));
   });
 
-  // 팝업: 노출/클릭 트래킹
-  // 팝업 DOM id가 welcomePopup 이므로 show 시점에 impression 기록
+  // 팝업 노출/클릭
   const popup = document.getElementById('welcomePopup');
-  const mo = new MutationObserver(m=>{ if([...m].some(x=>x.attributeName==='class' && popup.classList.contains('show'))){ send('popup_impression'); mo.disconnect(); }});
-  if(popup) mo.observe(popup,{attributes:true});
-  // 팝업 CTA
-  document.querySelectorAll('#welcomePopup a').forEach(el=>{
-    el.addEventListener('click', ()=> send('popup_click'));
-  });
+  if (popup) {
+    const mo = new MutationObserver(m=>{
+      if (m.some(x=>x.attributeName==='class' && popup.classList.contains('show'))) {
+        send('popup_impression'); mo.disconnect();
+      }
+    });
+    mo.observe(popup, {attributes:true});
+    popup.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('click', ()=> send('popup_click'));
+    });
+  }
 
-  // 일반 클릭도(참여 신호) 필요하면 공통 훅
+  // 일반 클릭(참여 시그널)
   document.addEventListener('click', (e)=>{
-    const a = e.target.closest('a,button');
-    if(!a) return;
-    if(!a.hasAttribute('data-logged')){ a.setAttribute('data-logged','1'); send('click', a.textContent.trim().slice(0,80)); }
+    const a = e.target.closest('a,button'); if (!a) return;
+    if (!a.dataset.logged) { a.dataset.logged = '1'; send('click', (a.textContent||'').trim().slice(0,80)); }
   }, {capture:true});
+})();
 </script>
 </body>
 </html>
