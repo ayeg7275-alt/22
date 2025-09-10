@@ -487,114 +487,15 @@
   </script>
 
   <!-- 이벤트 수집 스니펫 -->
- <script>
-(function(){
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
-  const SECRET   = 'perfume_secret';
-
-  // --- 기본 공통 데이터 ---
-  function sid() {
-    try {
-      const k = 'pfm_sid';
-      let v = localStorage.getItem(k);
-      if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem(k, v); }
-      return v;
-    } catch(_) { return Math.random().toString(36).slice(2); }
-  }
-  const base = {
-    token: SECRET,
-    session_id: sid(),
-    page: location.href,
-    referrer: document.referrer || '',
-    device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-    lang: (navigator.language||'').toLowerCase(),
-    ua: navigator.userAgent
-  };
-
-  // --- 전송: 우선 sendBeacon(POST text/plain), 실패 시 iframe GET(base64) ---
-  function send(data) {
-    const payload = JSON.stringify(Object.assign({}, base, data));
-    let ok = false;
-    if (navigator.sendBeacon) {
-      try {
-        ok = navigator.sendBeacon(ENDPOINT, new Blob([payload], {type:'text/plain;charset=UTF-8'}));
-      } catch(_){}
-    }
-    if (!ok) {
-      const url = ENDPOINT + '?j=' + btoa(unescape(encodeURIComponent(payload)));
-      const ifr = document.createElement('iframe');
-      ifr.style.display = 'none';
-      ifr.width=0; ifr.height=0; ifr.src = url;
-      document.body.appendChild(ifr);
-      setTimeout(()=>{ try{document.body.removeChild(ifr);}catch(_){}} , 2000);
-    }
-  }
-
-  // --- 페이지뷰 & 체류/스크롤 ---
-  const t0 = Date.now();
-  let maxScroll = 0;
-  function pct() { const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-                   const v = window.innerHeight; const y = window.scrollY||document.documentElement.scrollTop||0;
-                   return Math.min(100, Math.round(((y+v)/h)*100)); }
-  window.addEventListener('scroll', ()=>{ maxScroll = Math.max(maxScroll, pct()); }, {passive:true});
-
-  window.addEventListener('load', function(){
-    send({event_name:'pageview'});
-    // 종료 시 체류/스크롤 요약
-    addEventListener('beforeunload', function(){
-      send({
-        event_name:'page_exit',
-        time_on_page_sec: Math.round((Date.now()-t0)/1000),
-        max_scroll_pct: maxScroll
-      });
-    });
-  });
-
-  // --- 클릭 트래킹(HTML 수정 없이 셀렉터로 잡음) ---
-  function onClick(selector, event_name, extraFn){
-    document.addEventListener('click', function(e){
-      const el = e.target.closest(selector);
-      if (!el) return;
-      const data = {event_name, element_id: el.id||'', text: (el.innerText||'').trim().slice(0,80)};
-      if (extraFn) Object.assign(data, extraFn(el));
-      send(data);
-    }, true);
-  }
-
-  // 1) 레포트 미리보기(데스크톱/모바일 버튼 모두)
-  onClick('button[onclick*="showReportPreview"], .shine:has(>span)::not(*)', 'report_preview_click');
-  onClick('button, a', 'report_preview_click', el=>{
-    if ((el.tagName==='BUTTON' || el.tagName==='A') && /레포트 미리보기/.test(el.textContent)) return {};
-  });
-
-  // 2) 상담받기(카카오 오픈채팅 링크)
-  onClick('a[href^="https://open.kakao.com/o/"]', 'consulting_click', el=>{
-    // 카드 타이틀로 플랜 추론
-    let plan=''; try{
-      const card = el.closest('.glass');
-      const t = card ? card.querySelector('.text-lg, h3') : null;
-      plan = t ? (t.textContent||'').trim() : '';
-    }catch(_){}
-    return {plan};
-  });
-
-  // 3) 사전예약하기(구글 폼)
-  onClick('a[href^="https://forms.gle/"]', 'booking_click');
-
-  // 4) 팝업 CTA
-  onClick('#welcomePopup a', 'popup_cta_click');
-
-  // 디버그용
-  window.__perfumeTest = ()=>send({event_name:'test_click', extra:{note:'manual'}});
-})();
-</script>
-<!-- 이벤트 수집 스니펫 (GAS) : 이 블록을 기존 스크립트 아래/</body> 바로 위에 추가 -->
 <script>
 (function(){
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzKzArU4Y9Y__Of_LRvAs0DjcvwDdmoJTcd0rj6ZoRXcsM-69fZdLobeXD-2yB-vZjN/exec';
   const SECRET   = 'perfume_secret';
 
-  function sid(){ try{const k='pfm_sid'; let v=localStorage.getItem(k); if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem(k,v);} return v;}catch(_){return Math.random().toString(36).slice(2);} }
+  function sid(){ try{const k='pfm_sid'; let v=localStorage.getItem(k);
+    if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem(k,v);} return v;
+  }catch(_){return Math.random().toString(36).slice(2);} }
+
   const base = {
     token: SECRET,
     session_id: sid(),
@@ -605,28 +506,27 @@
     ua: navigator.userAgent
   };
 
-  // 전송: sendBeacon(POST text/plain) → 실패 시 iframe GET(base64)
   function send(data){
     const payload = JSON.stringify(Object.assign({}, base, data));
     let ok=false;
-    if(navigator.sendBeacon){
+    if (navigator.sendBeacon){
       try{ ok = navigator.sendBeacon(ENDPOINT, new Blob([payload], {type:'text/plain;charset=UTF-8'})); }catch(_){}
     }
-    if(!ok){
+    if (!ok){
       const url = ENDPOINT + '?j=' + btoa(unescape(encodeURIComponent(payload)));
-      const ifr = document.createElement('iframe');
-      ifr.style.display='none'; ifr.width=0; ifr.height=0; ifr.src=url;
-      document.body.appendChild(ifr);
-      setTimeout(()=>{ try{document.body.removeChild(ifr);}catch(_){} }, 1500);
+      const ifr = document.createElement('iframe'); ifr.style.display='none'; ifr.src = url;
+      document.body.appendChild(ifr); setTimeout(()=>{ try{document.body.removeChild(ifr);}catch(_){ } }, 1500);
     }
   }
 
-  // 체류/스크롤
-  const t0 = Date.now(); let maxScroll=0;
-  function pct(){ const h=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
-                  const v=innerHeight; const y=scrollY||document.documentElement.scrollTop||0;
-                  return Math.min(100, Math.round(((y+v)/h)*100)); }
-  addEventListener('scroll',()=>{ maxScroll=Math.max(maxScroll,pct()); }, {passive:true});
+  // 페이지 체류/스크롤
+  const t0 = Date.now(); let maxScroll = 0;
+  function scrollPct(){
+    const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    const v = innerHeight; const y = scrollY || document.documentElement.scrollTop || 0;
+    return Math.min(100, Math.round(((y+v)/h)*100));
+  }
+  addEventListener('scroll', ()=>{ maxScroll = Math.max(maxScroll, scrollPct()); }, {passive:true});
 
   addEventListener('load', ()=>{
     send({event_name:'pageview'});
@@ -635,34 +535,51 @@
     });
   });
 
-  // 클릭 캡처
+  // 안전한 클릭 캡처 유틸 (단순 셀렉터만 사용)
   function onClickMatch(selector, predicate, eventName, extra){
     document.addEventListener('click', (e)=>{
       const el = e.target.closest(selector);
       if(!el) return;
       if(!predicate(el)) return;
       const data = {event_name:eventName, element_id:el.id||'', text:(el.textContent||'').trim().slice(0,80)};
-      if(extra) Object.assign(data, extra(el));
+      if (extra) Object.assign(data, extra(el));
       send(data);
     }, true);
   }
 
-  // 레포트 미리보기
-  onClickMatch('button,a', el => /레포트 미리보기/.test(el.textContent||''), 'report_preview_click');
-  // 상담(오픈카톡)
-  onClickMatch('a', el => el.href && el.href.startsWith('https://open.kakao.com/o/'), 'consulting_click', el=>{
-    let plan=''; try{ const card=el.closest('.glass'); const t=card?card.querySelector('.text-lg, h3'):null; plan=t?(t.textContent||'').trim():''; }catch(_){}
-    return {plan};
-  });
-  // 사전예약(구글폼)
-  onClickMatch('a', el => el.href && el.href.startsWith('https://forms.gle/'), 'booking_click');
-  // 팝업 CTA
+  // ▶ 레포트 미리보기 버튼(텍스트 또는 onclick 속성으로 판별)
+  onClickMatch('button, a',
+    el => (el.matches('[onclick*="showReportPreview"]') ||
+           /레포트\s*미리보기/.test((el.textContent||'')) ),
+    'report_preview_click'
+  );
+
+  // ▶ 상담(오픈카톡)
+  onClickMatch('a',
+    el => !!(el.href && el.href.indexOf('https://open.kakao.com/o/') === 0),
+    'consulting_click',
+    el => {
+      let plan=''; try{
+        const card = el.closest('.glass');
+        const t = card ? card.querySelector('.text-lg, h3') : null;
+        plan = t ? (t.textContent||'').trim() : '';
+      }catch(_){}
+      return {plan};
+    }
+  );
+
+  // ▶ 사전예약(구글 폼)
+  onClickMatch('a',
+    el => !!(el.href && el.href.indexOf('https://forms.gle/') === 0),
+    'booking_click'
+  );
+
+  // ▶ 팝업 CTA
   onClickMatch('#welcomePopup a', _=>true, 'popup_cta_click');
 
-  // 디버그: 콘솔에서 __perfumeTest()
+  // 디버그용
   window.__perfumeTest = ()=>send({event_name:'test_click', extra:{note:'manual'}});
 })();
 </script>
-
 </body>
 </html>
