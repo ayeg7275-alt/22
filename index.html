@@ -104,14 +104,16 @@
     <div class="report-shell relative">
       <div class="report-close" onclick="closeReportPreview()">&times;</div>
       <div class="p-6 md:p-8">
-        <h2 class="text-2xl md:text-3xl font-bold mb-3 text-center" style="color: var(--text);">
+       <h2 class="text-2xl md:text-3xl font-bold mb-3 text-center" style="color: var(--text);">
   📊 향기 컨설팅 레포트 미리보기
 </h2>
 <p class="text-center text-gray-600">실제 컨설팅에서 제공되는 레포트 샘플입니다</p>
 
-<!-- ✅ HTML만으로 2×2 고정 & 블러 -->
+<!-- 한 화면에 들어오도록 높이 고정 -->
 <div style="height:min(62vh,540px); margin-top:8px;">
-  <div class="grid grid-cols-2 grid-rows-2 gap-3 h-full">
+
+  <!-- ✅ 데스크톱/태블릿(>=640px): 2×2 그리드, 4장 -->
+  <div class="hidden sm:grid grid-cols-2 grid-rows-2 gap-3 h-full">
     <div class="rounded-xl overflow-hidden" style="background:#f6f6f6;">
       <img src="https://i.imgur.com/QNgA4yX.jpeg" alt="레포트 샘플 1"
            class="w-full h-full object-cover"
@@ -137,11 +139,26 @@
            onerror="this.style.display='none';">
     </div>
   </div>
+
+  <!-- ✅ 모바일(<640px): 2번 + 4번만 세로로 크게(위/아래) -->
+  <div class="sm:hidden flex flex-col gap-3 h-full">
+    <div class="rounded-xl overflow-hidden" style="background:#f6f6f6; flex:1;">
+      <img src="https://i.imgur.com/kTAobyG.jpeg" alt="레포트 샘플 2"
+           class="w-full h-full object-cover"
+           style="filter:blur(3px); transform:translateZ(0);"
+           onerror="this.style.display='none';">
+    </div>
+    <div class="rounded-xl overflow-hidden" style="background:#f6f6f6; flex:1;">
+      <img src="https://i.imgur.com/G3gpDgR.jpeg" alt="레포트 샘플 4"
+           class="w-full h-full object-cover"
+           style="filter:blur(3px); transform:translateZ(0);"
+           onerror="this.style.display='none';">
+    </div>
+  </div>
+
 </div>
 
-<p class="text-center text-sm text-gray-500 mt-3">
-  * 실제 레포트는 고해상도로 제공됩니다
-</p>
+<p class="text-center text-sm text-gray-500 mt-3">* 실제 레포트는 고해상도로 제공됩니다</p>
 
 <a href="https://forms.gle/wbR4GTb5Rz7Q4yZY6" target="_blank"
    class="w-full inline-flex justify-center shine rounded-2xl bg-gradient-to-r from-[var(--cta-from)] to-[var(--cta-to)] text-white font-semibold px-6 py-3 text-base md:text-lg mt-3">
